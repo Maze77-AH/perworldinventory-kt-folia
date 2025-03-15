@@ -26,6 +26,8 @@ import org.bukkit.plugin.java.JavaPluginLoader
 import java.io.File
 import java.nio.file.Files
 import java.util.*
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
+import java.util.concurrent.TimeUnit
 
 class PerWorldInventory : JavaPlugin
 {
@@ -97,8 +99,12 @@ class PerWorldInventory : JavaPlugin
         }
 
         // Start task to prevent item duping across worlds
-        updateTimeoutsTaskId = server.scheduler.scheduleSyncRepeatingTask(
-                this, UpdateTimeoutsTask(this), 1L, 1L
+        val updateTimeoutsTask: ScheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(
+            this,
+            { _: ScheduledTask -> UpdateTimeoutsTask(this).run() },
+            1L,
+            1L,
+            TimeUnit.SECONDS
         )
 
         // ConfigurationSerializable classes must be registered as such

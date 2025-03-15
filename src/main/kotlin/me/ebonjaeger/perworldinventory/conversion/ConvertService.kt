@@ -16,6 +16,8 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.PluginManager
 import java.io.File
 import javax.inject.Inject
+import org.bukkit.Bukkit
+import java.util.function.Consumer
 
 /**
  * Initiates conversion tasks.
@@ -53,7 +55,7 @@ class ConvertService @Inject constructor(private val plugin: PerWorldInventory,
         convertGroups(groups)
 
         val task = ConvertTask(this, groupManager, sender, offlinePlayers, groups, dataDirectory)
-        task.runTaskTimerAsynchronously(plugin, 0, 20)
+        Bukkit.getAsyncScheduler().runAtFixedRate(plugin, Consumer { task.run() }, 0L, 20L, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     fun finishConversion(converted: Int) {

@@ -104,12 +104,11 @@ object TestHelper
         // This is required for ItemStack#setItemMeta to be successful
         val itemMeta = ItemMetaTestImpl()
         val metaArg = slot<ItemMeta>()
-        val materialArg = slot<Material>()
         every { itemFactory.getItemMeta(any()) } answers { itemMeta }
         every { itemFactory.equals(any(), isNull()) } returns false
         every { itemFactory.isApplicable(ofType(ItemMeta::class), ofType(Material::class)) } returns true
         every { itemFactory.asMetaFor(capture(metaArg), ofType(Material::class)) } answers { metaArg.captured }
-        every { itemFactory.updateMaterial(ofType(ItemMeta::class), capture(materialArg)) } answers { materialArg.captured }
+        // Removed the call to updateMaterial as it does not exist in ItemFactory
 
         return itemFactory
     }

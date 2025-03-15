@@ -1,6 +1,7 @@
 package me.ebonjaeger.perworldinventory
 
 import java.util.logging.Logger
+import java.io.StringWriter
 
 /**
  * Static logger.
@@ -40,7 +41,8 @@ object ConsoleLogger
     fun severe(message: String, cause: Throwable)
     {
         logger?.severe(message + " " + formatThrowable(cause))
-        cause.printStackTrace()
+        val sw = java.io.StringWriter()
+        logger?.severe(sw.toString())
     }
 
     /**
@@ -62,7 +64,8 @@ object ConsoleLogger
     fun warning(message: String, cause: Throwable)
     {
         logger?.warning(message + " " + formatThrowable(cause))
-        cause.printStackTrace()
+        val sw = StringWriter()
+        logger?.warning(sw.toString())
     }
 
     /**

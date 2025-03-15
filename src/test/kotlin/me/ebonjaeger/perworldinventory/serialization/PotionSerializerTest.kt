@@ -15,8 +15,12 @@ class PotionSerializerTest
     @BeforeEach
     fun registerPotionEffects()
     {
-        PotionEffectType.registerPotionEffectType(PotionEffectType.ABSORPTION)
-        PotionEffectType.registerPotionEffectType(PotionEffectType.GLOWING)
+        if (PotionEffectType.getByName("ABSORPTION") == null) {
+            PotionEffectType.ABSORPTION
+        }
+        if (PotionEffectType.getByName("GLOWING") == null) {
+            PotionEffectType.GLOWING
+        }
     }
 
     @Test

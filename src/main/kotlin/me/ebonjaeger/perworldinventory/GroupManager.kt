@@ -5,14 +5,17 @@ import me.ebonjaeger.perworldinventory.configuration.Settings
 import me.ebonjaeger.perworldinventory.initialization.PluginFolder
 import me.ebonjaeger.perworldinventory.service.BukkitService
 import org.bukkit.GameMode
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import java.util.concurrent.CompletableFuture
 
 class GroupManager @Inject constructor(@PluginFolder pluginFolder: File,
                                        private val bukkitService: BukkitService,
-                                       private val settings: Settings)
+                                       private val settings: Settings,
+                                       private val plugin: PerWorldInventory)
 {
 
     private val WORLDS_CONFIG_FILE = File(pluginFolder, "worlds.yml")
@@ -47,7 +50,7 @@ class GroupManager @Inject constructor(@PluginFolder pluginFolder: File,
         group.configured = configured
         ConsoleLogger.fine("Adding group to memory: ${group.name}")
         ConsoleLogger.debug("Group properties: $group")
-        groups[name.toLowerCase()] = group
+        groups[name.lowercase()] = group
     }
 
     /**
@@ -58,7 +61,7 @@ class GroupManager @Inject constructor(@PluginFolder pluginFolder: File,
      * @return The Group
      */
     fun getGroup(name: String): Group?
-            = groups[name.toLowerCase()]
+            = groups[name.lowercase()]
 
     /**
      * Get the group that contains a specific world. This method iterates
@@ -95,42 +98,44 @@ class GroupManager @Inject constructor(@PluginFolder pluginFolder: File,
      */
     fun removeGroup(group: String)
     {
-        groups.remove(group.toLowerCase())
+        groups.remove(group.lowercase())
         ConsoleLogger.fine("Removed group '$group'")
     }
 
     /**
      * Load the groups configured in the file `worlds.yml` into memory.
      */
-    fun loadGroups()
-    {
+    fun loadGroups() {
         groups.clear()
-
-        bukkitService.runTaskAsynchronously {
-            val yaml = YamlConfiguration.loadConfiguration(WORLDS_CONFIG_FILE)
-            bukkitService.runTask {
+    
+        // Run the YAML loading off the main thread using a CompletableFuture.
+        CompletableFuture.supplyAsync {
+            YamlConfiguration.loadConfiguration(WORLDS_CONFIG_FILE)
+        }.thenAccept { yaml ->
+            // Then switch back to the main thread to update groups.
+            Bukkit.getScheduler().runTask(plugin, Runnable {
                 var section = yaml.getConfigurationSection("groups.")
-
-                if (section == null) { // Ensure the file contains the groups section
+                if (section == null) {
                     section = yaml.createSection("groups")
                 }
-
                 section.getKeys(false).forEach { key ->
                     val worlds = yaml.getStringList("groups.$key.worlds").toMutableSet()
-                    val gameMode = GameMode.valueOf( (yaml.getString("groups.$key.default-gamemode") ?: "SURVIVAL").toUpperCase() )
+                    val gameMode = GameMode.valueOf(
+                        (yaml.getString("groups.$key.default-gamemode") ?: "SURVIVAL").uppercase()
+                    )
                     val respawnWorld = if (yaml.contains("groups.$key.respawnWorld"))
-                    {
                         yaml.getString("groups.$key.respawnWorld")
-                    } else
-                    {
+                    else
                         null
-                    }
-
+    
                     addGroup(key, worlds, gameMode, respawnWorld, true)
                 }
-            }
+            })
         }
     }
+    
+    
+    
 
     /**
      * Save all of the groups currently in memory to the disk.

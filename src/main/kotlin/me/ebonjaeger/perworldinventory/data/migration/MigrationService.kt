@@ -11,6 +11,9 @@ import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 import java.io.File
 import javax.inject.Inject
+import java.util.function.Consumer
+import org.bukkit.plugin.Plugin
+
 
 class MigrationService @Inject constructor(private val groupManager: GroupManager,
                                            private val plugin: PerWorldInventory,
@@ -39,7 +42,7 @@ class MigrationService @Inject constructor(private val groupManager: GroupManage
         migrating = true
 
         val task = MigrationTask(this, offlinePlayers, dataDirectory, groupManager.groups.values)
-        task.runTaskTimerAsynchronously(plugin, 0, 20)
+        Bukkit.getAsyncScheduler().runAtFixedRate(plugin, Consumer { task.run() }, 0L, 20L, java.util.concurrent.TimeUnit.SECONDS)
     }
 
     /**

@@ -5,7 +5,9 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import io.mockk.every
 import io.mockk.mockkClass
+import io.mockk.mockk
 import me.ebonjaeger.perworldinventory.TestHelper.mockGroup
+import org.bukkit.plugin.Plugin
 import me.ebonjaeger.perworldinventory.configuration.PluginSettings
 import me.ebonjaeger.perworldinventory.configuration.Settings
 import me.ebonjaeger.perworldinventory.service.BukkitService
@@ -23,7 +25,11 @@ class GroupManagerTest {
 
     private val settings = mockkClass(Settings::class)
 
-    private val groupManager = GroupManager(File(""), bukkitService, settings)
+    // Create a mock/fake plugin for testing.
+    private val plugin = mockk<Plugin>(relaxed = true)
+    private val perWorldInventory = mockk<PerWorldInventory>(relaxed = true)
+    private val groupManager = GroupManager(File(""), bukkitService, settings, perWorldInventory)
+
 
     @Test
     fun shouldReturnAbsentValueForNonExistentGroup() {

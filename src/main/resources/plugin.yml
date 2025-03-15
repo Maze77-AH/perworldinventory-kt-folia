@@ -3,6 +3,7 @@ version: maven-version
 name: maven-name
 author: maven-authors
 softdepend: [Vault]
+folia-supported: true
 api-version: 1.13
 
 commands:

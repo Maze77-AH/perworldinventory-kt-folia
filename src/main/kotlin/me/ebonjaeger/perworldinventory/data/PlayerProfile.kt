@@ -45,16 +45,16 @@ data class PlayerProfile(val armor: Array<out ItemStack>,
      */
     constructor(player: Player,
                 balance: Double) : this(
-            player.inventory.armorContents,
-            player.enderChest.contents,
-            player.inventory.contents,
+            player.inventory.armorContents!!.filterNotNull().toTypedArray(),
+            player.enderChest.contents!!.filterNotNull().toTypedArray(),
+            player.inventory.contents!!.filterNotNull().toTypedArray(),
             player.allowFlight,
-            player.displayName,
+            player.name,
             player.exhaustion,
             player.exp,
             player.isFlying,
             player.foodLevel,
-            player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue, // If this is ever null, I will be very surprised
+            player.getAttribute(Attribute.MAX_HEALTH)!!.baseValue, // If this is ever null, I will be very surprised
             player.health,
             player.gameMode,
             player.level,
