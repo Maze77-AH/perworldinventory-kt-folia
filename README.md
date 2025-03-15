@@ -12,7 +12,7 @@ Kotlin programming language.
 [![Dependency Status](https://www.versioneye.com/user/projects/5aea27cb0fb24f5450e028a7/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5aea27cb0fb24f5450e028a7)
 [![codecov](https://codecov.io/gh/EbonJaeger/perworldinventory-kt/branch/master/graph/badge.svg)](https://codecov.io/gh/EbonJaeger/perworldinventory-kt)
 ## Building Prerequisites
-* JDK 8
+* JDK 21 - Built on Minecraft 1.21.4
 * Maven
 
 ## Building
